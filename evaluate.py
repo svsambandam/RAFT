@@ -1,21 +1,20 @@
 import sys
+
 sys.path.append('core')
 
-from PIL import Image
 import argparse
 import os
 import time
+
+import core.datasets as datasets
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn.functional as F
-import matplotlib.pyplot as plt
-
-import datasets
-from utils import flow_viz
-from utils import frame_utils
-
-from raft import RAFT
-from utils.utils import InputPadder, forward_interpolate
+from core.raft import RAFT
+from core.utils import flow_viz, frame_utils
+from core.utils.utils import InputPadder, forward_interpolate
+from PIL import Image
 
 
 @torch.no_grad()
@@ -99,7 +98,7 @@ def validate_sintel(model, iters=32):
     results = {}
     for dstype in ['clean', 'final']:
         val_dataset = datasets.MpiSintel(split='training', dstype=dstype)
-        epe_list = []
+        epe_list = [] 
 
         for val_id in range(len(val_dataset)):
             image1, image2, flow_gt, _ = val_dataset[val_id]

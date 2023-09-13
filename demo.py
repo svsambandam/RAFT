@@ -1,19 +1,19 @@
 import sys
+
 sys.path.append('core')
 
 import argparse
-import os
-import cv2
 import glob
+import os
+
+import cv2
+import ipdb
 import numpy as np
 import torch
+from core.raft import RAFT
+from core.utils import flow_viz
+from core.utils.utils import InputPadder
 from PIL import Image
-
-from raft import RAFT
-from utils import flow_viz
-from utils.utils import InputPadder
-
-
 
 DEVICE = 'cuda'
 
@@ -31,15 +31,16 @@ def viz(img, flo):
     flo = flow_viz.flow_to_image(flo)
     img_flo = np.concatenate([img, flo], axis=0)
 
-    # import matplotlib.pyplot as plt
-    # plt.imshow(img_flo / 255.0)
-    # plt.show()
+    import matplotlib.pyplot as plt
+    plt.imshow(img_flo / 255.0)
+    plt.show()
 
-    cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
-    cv2.waitKey()
+    # cv2.imshow('image', img_flo[:, :, [2,1,0]]/255.0)
+    # cv2.waitKey()
 
 
 def demo(args):
+    print('test')
     model = torch.nn.DataParallel(RAFT(args))
     model.load_state_dict(torch.load(args.model))
 
@@ -61,6 +62,7 @@ def demo(args):
 
             flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
             viz(image1, flow_up)
+            # ipdb.set_trace()
 
 
 if __name__ == '__main__':
