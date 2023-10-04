@@ -77,7 +77,10 @@ def index(args):
         fname = Path(datapath) / Path(frame["file_path"].replace("./", "") + ".png")
         image_filenames.append(fname)
         poses.append(np.array(frame["transform_matrix"]))
-        times.append(frame["time"])
+        if "time" in frame:
+            times.append(frame["time"])
+        else:
+            times.append((len(poses)-1)/len(meta))
     poses = np.array(poses).astype(np.float32)
     times = torch.tensor(times, dtype=torch.float32)
 
@@ -119,13 +122,13 @@ def demo(args):
                 image1, image2 = padder.pad(image1, image2) 
 
                 flow_low, flow_up = model(image1, image2, iters=20, test_mode=True)
-                viz(image1, image2, flow_up)
+                # viz(image1, image2, flow_up)
 
                 if j == 0:
                     flows_ = flow_up
                 else:
                     flows_ = torch.cat((flows_, flow_up))
-                print( '-----', i, idx[i,j])
+                # print( '-----', i, idx[i,j])
             if i == 0:
                 flows = flows_[None]
             else:
@@ -148,4 +151,4 @@ if __name__ == '__main__':
 
     demo(args)
 
-# python demo-sne.py --model=models/raft-kitti.pth --path=/ubc/cs/research/kmyi/svsamban/research/sdfstudio/data/dnerf/lego/train --mixed_precision
+# python demo-sne.py --model=models/raft-kitti.pth --path=/ubc/cs/research/kmyi/svsamban/research/sdfstudio/data/dnerf/hook --mixed_precision --split val
